@@ -1,0 +1,5 @@
+####################################
+# TemplateTRM parameters file
+####################################
+threshold_max=0.8
+threshold_min=0.4
