@@ -226,7 +226,7 @@ public class Controller implements Observer {
         Collection<Observer> observers = new LinkedList<Observer>();
         observers.add(observer);
         observers.add(this);
-        simulation = new Simulation(observers, requiredService, 
+        simulation = new Simulation(observers, requiredService, //Lefteris 
                         dynamic, oscillating, collusion, 
                         numExecutions, currentNetwork);
         simulationThread = new Thread(simulation);

@@ -39,30 +39,45 @@
  * along with this program (lgpl.txt).  If not, see <http://www.gnu.org/licenses/>
 */
 
-package es.ants.felixgm.trmsim_wsn.satisfaction;
+package es.ants.felixgm.trmsim_wsn.trm.templatetrm;
+
+import es.ants.felixgm.trmsim_wsn.satisfaction.Satisfaction;
 
 /**
- * <p>This interface models the root of a hierarchy of different representations
- * (fuzzy sets, real numbers, binary values, etc) of the satisfaction a sensor
- * acting as a client has with the received service from a sensor acting as a server</p>
- * @author <a href="http://ants.dif.um.es/~felixgm/en" target="_blank">F&eacute;lix G&oacute;mez M&aacute;rmol</a>, <a href="http://webs.um.es/gregorio" target="_blank">Gregorio Mart&iacute;nez P&eacute;rez</a>
- * @version 0.4
+ * <p>This class models a transaction between two sensors and the corresponding
+ * satisfaction of the client who received the service</p>
+ * @author <a href="http://ants.dif.um.es/~felixgm/en" target="_blank">F&eacute;lix G&oacute;mez M&aacute;rmol</a>, <a href="http://webs.um.es/gregorio" target="_blank">Gregorio Mart&iacute;nez P&eacute;rez</a> and Antonio Bern&aacute;rdez
+ * @version 0.3
  * @since 0.2
  */
-public interface Satisfaction{
-    /**
-     * This method indicates if this Satisfaction object represents a satisfactory
-     * or unsatisfactory transaction
-     * @return true if this Satisfaction object represents a satisfactory
-     * transaction, false otherwise
-     */
-    public boolean isSatisfied();
+public class Transaction {
+    /** The service provider*/
+    /** Outcome with the satisfaction of the client with the received service */
+    private MyOutcome outcome;
+    
+	protected final double severity;
+	protected double fading;
 
     /**
-     * This method aggregates this satisfaction with the given one
-     * @param satisfaction Satisfaction to be aggregated with this satisfaction
-     * @return The aggregation of this satisfaction with the given one
+     * Class Transaction constructor
+     * @param client The client who requested the service
+     * @param server The server who provided the service
+     * @param outcome Outcome with the satisfaction of the client with the received service
      */
-    public Satisfaction aggregate(Satisfaction satisfaction);
+    public Transaction ( MyOutcome outcome){
+        this.outcome = outcome;
+        fading=1;
+        severity=Math.random();
+        
+        
+    }
 
+
+    /**
+     * Returns the satisfaction of the client with the received service
+     * @return The satisfaction of the client with the received service
+     */
+    public Satisfaction getSatisfaction() {
+        return outcome.get_satisfaction();
+    }
 }

@@ -202,7 +202,6 @@ public class Simulation extends Observable implements Runnable {
                     int j = 0;
                     for (Sensor client : network.get_clients()) 
                         clients[j++] = new Thread(client);
-
                     for (int i = 0; i < clients.length; i++)
                         clients[i].start();
 
@@ -212,7 +211,7 @@ public class Simulation extends Observable implements Runnable {
                     for (Sensor client : network.get_clients()) 
                         if (client.get_outcome() != null)
                             outcomes.add(client.get_outcome());
-                    
+
                     if ((oscillating) && (Ne % 20 == 0))
                         network.oscillate(requiredService);
 
@@ -221,7 +220,7 @@ public class Simulation extends Observable implements Runnable {
                         notifyObservers(network);
                     }
 
-                    if (numNetworks == 1) {
+                   /* if (numNetworks == 1) { Lefteris
                         Outcome outcome = Outcome.computeOutcomes(outcomes,network,requiredService,Ne);
                         if (outcome == null) {
                             setChanged();
@@ -236,7 +235,8 @@ public class Simulation extends Observable implements Runnable {
                             setChanged();
                             notifyObservers(globalOutcomes);
                         }
-                    }
+                    }*/
+
                 }
 
                 if (stop) {

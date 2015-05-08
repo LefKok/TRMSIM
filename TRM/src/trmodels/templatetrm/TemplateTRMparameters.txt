@@ -1,5 +1,5 @@
 ####################################
 # TemplateTRM parameters file
 ####################################
-parameter1Name=parameter1Value
-parameter2Name=parameter2Value
+threshold_max=0.8
+threshold_min=0.4

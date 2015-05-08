@@ -44,7 +44,12 @@ package es.ants.felixgm.trmsim_wsn.trm.templatetrm;
 import es.ants.felixgm.trmsim_wsn.network.Network;
 import es.ants.felixgm.trmsim_wsn.network.Sensor;
 import es.ants.felixgm.trmsim_wsn.network.Service;
+
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * <p>This class models a network composed by sensors implementing TemplateTRM</p>
@@ -53,12 +58,18 @@ import java.util.Collection;
  * @since 0.3
  */
 public class TemplateTRM_Network extends Network {
+	
+	
+    protected HashMap<String,Application_struct> Service_VEs; //
+
+	
+	
     /**
      * This constructor creates a new random TemplateTRM Network using the given parameters
      * @param numSensors Network number sensors
      * @param probClients The network will have a number of clients depending of this parameter.
      * @param rangeFactor Range Factor.
-     * @param probServices Probability of servers offers services.
+     * @param probServices Probability of servers offers services and clients requesting services.
      * @param probGoodness Probability of servers being good.
      * @param services Services that servers offers to clients.
      */
@@ -69,8 +80,94 @@ public class TemplateTRM_Network extends Network {
             Collection<Double> probServices,
             Collection<Double> probGoodness,
             Collection<Service> services) {
-        super(numSensors, probClients, rangeFactor, probServices, probGoodness, services);
+    	super(null,null,null);
+    	Service_VEs=new HashMap<String,Application_struct>();
+    	clients = new ArrayList<Sensor>();
+        servers = new ArrayList<Sensor>();
+        sensors = new ArrayList<Sensor>();
+        this.services = new ArrayList<Service>();//ola ta services tou systhmatos
+       /* services.add(new Service("vehicle"));
+        probServices.add(0.7);
+        probGoodness.add(0.7);*/
+        for (Service service : services)					
+        	Service_VEs.put(service.id,new Application_struct(service.id)); //create Platforms log file
+
+
+
+
+        Sensor.resetId();
+        Sensor.setMaxDistance(maxDistance);
+
+        for (int i = 0; i < numSensors; i++) {
+            if (Math.random() <= probClients) { //client intialize
+                TemplateTRM_Sensor client = newSensor();
+                clients.add(client);
+                sensors.add(client);
+                Iterator<Double> itProbServices = probServices.iterator(); 
+                for (Service service : services)					//add requested services
+                    if (Math.random() <= itProbServices.next().doubleValue()) {
+                    	client.addNewService(service.id);
+                    }
+                	
+            } else { 							//server intialize
+            	TemplateTRM_Sensor server = newSensor();
+                clients.add(server);
+                servers.add(server);
+                sensors.add(server);
+
+                Iterator<Double> itProbServices1 = probServices.iterator();
+                Iterator<Double> itProbServices2 = probServices.iterator(); 
+                Iterator<Double> itProbGoodness = probGoodness.iterator();
+                
+                for (Service service : services) //add requested services
+                    if (Math.random() <= itProbServices1.next().doubleValue()) {
+                    	server.addNewService(service.id);
+                    }
+                
+                for (Service service : services) //add provided services
+                    if (Math.random() <= itProbServices2.next().doubleValue()) { 
+                    	Service_VEs.get(service.id).followee_put(server); //network has every sensor classfied by provided service
+                    	if (Math.random() <= itProbGoodness.next().doubleValue())//check quality of service
+                            if(Math.random() <= 0.5 )
+                            	server.addService(service, Math.random()*(0.25)+0.5);  //neutral
+                            else server.addService(service, Math.random()*(0.25)+0.75); ///vendor
+                        else
+                            server.addService(service, Math.random()*0.5); //malicious
+
+                        if (!this.services.contains(service))
+                            this.services.add(service);
+                    }
+            }
+        }
+        
+        if (clients.size() == 0) {
+        	TemplateTRM_Sensor client = newSensor();
+            clients.add(client);
+            sensors.add(client);
+            Iterator<Double> itProbServices = probServices.iterator(); 
+            for (Service service : services)					//add requested services
+                if (Math.random() <= itProbServices.next().doubleValue()) {
+                	client.addNewService(service.id);
+                }
+        }
+
+        // We are going to add some friends to the sensors one for each service it requests
+        for (Sensor client : clients){
+        	TemplateTRM_Sensor myclient = (TemplateTRM_Sensor) client;
+        	Set<String> ServiceSet = myclient.getRequestedServices();
+        	for (String service : ServiceSet){
+        	//	System.out.println(Service_VEs.get(service.id)+service.toString());
+        		TemplateTRM_Sensor followee = Service_VEs.get(service).get_random_entry();
+        		client.addLink(followee);
+        		myclient.addfollowee(followee,service);      		
+        	}      	
+        }
+    	
+    	
         reset();
+        
+        
+        
     }
 
     /**
@@ -86,7 +183,7 @@ public class TemplateTRM_Network extends Network {
     }
 
     @Override
-    public Sensor newSensor(){
+    public TemplateTRM_Sensor newSensor(){
         return new TemplateTRM_Sensor();
     }
 

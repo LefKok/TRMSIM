@@ -70,45 +70,45 @@ import java.util.Vector;
  */
 public abstract class Sensor implements Runnable {
     /** Indicates whether a collusion among malicious sensors is built */
-    protected static boolean collusion = false;
+    public static boolean collusion = false;
     /** Indicates whether some sensors will switch off sometimes in order to save energy */
-    protected static boolean dynamic = false;
+    public static boolean dynamic = false;
     /** Indicates whether a simulation is currently running or not */
-    protected static boolean runningSimulation = false;
+    public static boolean runningSimulation = false;
     /** Sensors' identifier counter  */
-    protected static int idCount = 1;
+    public static int idCount = 1;
     /** Sensor's identifier */
-    protected int id;
+    public int id;
     /** Maximum distance between two nodes in the network */
-    protected static double _maxDistance = 0;
+    public static double _maxDistance = 0;
     /** X coordinate of this sensor */
-    protected double xPosition;
+    public double xPosition;
     /** Y coordinate of this sensor */
-    protected double yPosition;
+    public double yPosition;
     /** Outcoming links of this sensor */
-    protected Collection<Link> links;
+    public Collection<Link> links;
     /** Goodness of this sensor related to each provided service */
-    protected HashMap<Service,Double> servicesGoodness;
+    public HashMap<Service,Double> servicesGoodness;
     /** Service requested by the clients */
-    protected Service requiredService;
+    public Service requiredService;
     /** Indicates whether this sensor is currently active or in an idle state */
-    protected boolean activeState;
+    public boolean activeState;
     /** Number of service requests provided by this sensor */
-    protected int numRequests;
+    public int numRequests;
     /** Number of service requests provided by this sensor after which it goes to sleep */
-    protected static final int numRequestsThreshold = 20;
+    public static final int numRequestsThreshold = 20;
     /** Used to determine the amount of time (in ms) a sensor stays asleep */
     private static final long sleepingTimeoutMilis = 1000;
     /** Current Trust and Reputation model used by every Sensor */
-    protected static TRModel_WSN trmmodelWSN;
+    public static TRModel_WSN trmmodelWSN;
     /** Last outcome of a performed transaction */
-    protected Outcome outcome;
+    public Outcome outcome;
     /** Total distance traveled by the messages sent from this sensor */
-    protected long transmittedDistance;
+    public long transmittedDistance;
     /** Three timers that are used to set the timing for sleep/active state */
-    protected Timer numRequestsTimer;
-    protected Timer sleepTimer;
-    protected Timer sleepTimerAux;    
+    public Timer numRequestsTimer;
+    public Timer sleepTimer;
+    public Timer sleepTimerAux;    
     
     /**
      * Class Sensor constructor.
@@ -209,7 +209,7 @@ public abstract class Sensor implements Runnable {
      * @param service The requested service
      * @return true if this sensor can reach another sensor offering a given service with posiitve goodness; false otherwise
      */
-    private boolean reachesQualifiedService(Service service) {
+    public boolean reachesQualifiedService(Service service) {
         Collection<Vector<Sensor>> pathsToServers = findSensors(new IsServerSearchCondition(service,IsServerSearchCondition.BENEVOLENT_SERVER));
         return ((pathsToServers != null) && (pathsToServers.size() > 0));
     }
@@ -375,7 +375,7 @@ public abstract class Sensor implements Runnable {
      * @param service The asking service's name
      * @return true if this sensor indeed offers the asking service, false otherwise
      */
-    protected boolean offersService(String service) {
+    public boolean offersService(String service) {
         return (getService(service) != null);
     }
 

@@ -45,6 +45,7 @@ import es.ants.felixgm.trmsim_wsn.outcomes.Outcome;
 import es.ants.felixgm.trmsim_wsn.network.Network;
 import es.ants.felixgm.trmsim_wsn.network.Sensor;
 import es.ants.felixgm.trmsim_wsn.network.Service;
+import es.ants.felixgm.trmsim_wsn.search.IsServerSearchCondition;
 import es.ants.felixgm.trmsim_wsn.trm.GatheredInformation;
 import es.ants.felixgm.trmsim_wsn.trm.TRModel_WSN;
 import java.util.Collection;
@@ -90,7 +91,9 @@ public class TemplateTRM  extends TRModel_WSN {
 
     @Override
     public GatheredInformation gatherInformation(Sensor client, Service service) {
-        return null;
+    	
+    	 Collection<Vector<Sensor>> pathsToServers = client.findSensors(new IsServerSearchCondition(service));
+         return new GatheredInformation(pathsToServers);
     }
 
     @Override

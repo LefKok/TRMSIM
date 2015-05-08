@@ -176,11 +176,11 @@ public abstract class Network {
         Sensor.setMaxDistance(maxDistance);
 
         for (int i = 0; i < numSensors; i++) {
-            if (Math.random() <= probClients) {
+            if (Math.random() <= probClients) { //client intialize
                 Sensor client = newSensor();
                 clients.add(client);
                 sensors.add(client);
-            } else {
+            } else { 							//server intialize
                 Sensor server = newSensor();
                 servers.add(server);
                 sensors.add(server);

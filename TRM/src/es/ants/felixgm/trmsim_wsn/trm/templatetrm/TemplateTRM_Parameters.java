@@ -50,27 +50,30 @@ import es.ants.felixgm.trmsim_wsn.trm.TRMParameters;
  *    ####################################
  *    # TemplateTRM parameters file
  *    ####################################
- *    parameter1Name=parameter1Value
- *    parameter2Name=parameter2Value
+ *    threshold_max=0.8
+ *    threshold_min=0.4
  * </pre>
- * This file can be downloaded
- * <a href="http://ants.dif.um.es/~felixgm/research/trmsim-wsn/resources/TemplateTRMparameters.txt" target=_blank">here</a>.
- * But if any of the parameters can not be successfully extracted from the file, they are set
- * to a default value.
- *
- * @author <a href="http://ants.dif.um.es/~felixgm/en" target="_blank">F&eacute;lix G&oacute;mez M&aacute;rmol</a>, <a href="http://webs.um.es/gregorio" target="_blank">Gregorio Mart&iacute;nez P&eacute;rez</a>
- * @version 0.3
- * @since 0.3
  */
 public class TemplateTRM_Parameters extends TRMParameters {
     /** Default parameters file name */
     public static final String defaultParametersFileName = "trmodels/templatetrm/TemplateTRMparameters.txt";
+   /* trust threshold for services with minor severity*/
+    private double threshold_min; 
+    /* trust threshold for services with major severity*/
+    private double threshold_max;
+
 
     /**
      * Creates a new instance of TemplateTRM_Parameters setting them to their default values
      */
     public TemplateTRM_Parameters() {
         super();
+        parametersFileHeader = "####################################\n";
+        parametersFileHeader += "# PeerTrust parameters file\n";
+        parametersFileHeader += "# "+(new java.util.Date())+"\n";
+        parametersFileHeader += "####################################\n";
+        threshold_max=0.8;
+        threshold_min=0.4;
     }
 
     /**
@@ -80,10 +83,37 @@ public class TemplateTRM_Parameters extends TRMParameters {
      */
     public TemplateTRM_Parameters(String fileName) throws Exception {
         super(fileName);
+        parametersFileHeader = "####################################\n";
+        parametersFileHeader += "# PeerTrust parameters file\n";
+        parametersFileHeader += "# "+(new java.util.Date())+"\n";
+        parametersFileHeader += "####################################\n";
+        threshold_max=getDoubleParameter("threshold_max");
+        threshold_min=getDoubleParameter("threshold_min");
     }
 
     @Override
-    public String toString() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+	public String toString() {
+		return "TemplateTRM_Parameters [threshold_min=" + threshold_min
+				+ ", threshold_max=" + threshold_max + "]";
+	}
+
+	public double getThreshold_min() {
+		return threshold_min;
+	}
+
+	public void setThreshold_min(double threshold_min) {
+		this.threshold_min = threshold_min;
+	}
+
+	public double getThreshold_max() {
+		return threshold_max;
+	}
+
+	public void setThreshold_max(double threshold_max) {
+		this.threshold_max = threshold_max;
+	}
+
+	public static String getDefaultparametersfilename() {
+		return defaultParametersFileName;
+	}
 }

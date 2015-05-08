@@ -1800,7 +1800,7 @@ public class TRMSim_WSN extends javax.swing.JFrame implements Observer {
                 outcomesPanel.clearPanel();
                 outcomesPanel.drawAxes();
             }
-            C.runTRM_WSN(this, dynamic, oscillating, collusion, numExecutions);
+            C.runTRM_WSN(this, dynamic, oscillating, collusion, numExecutions); //Lefteris
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this,ex.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
             stopTRMButtonActionPerformed(evt);

@@ -51,7 +51,7 @@ package es.ants.felixgm.trmsim_wsn.network;
  */
 public class Service {
     /** Services's identifier */
-    protected String id;
+    public String id;
 
     /**
      * Class Service constructor

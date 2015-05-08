@@ -143,6 +143,7 @@ public abstract class TRModel_WSN {
             Collection<Double> probServices,
             Collection<Double> probGoodness,
             Collection<Service> services);
+    
 
     /**
      * This method loads a network from a XML file and creates the specific network
