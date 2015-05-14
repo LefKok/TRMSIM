@@ -150,7 +150,6 @@ public abstract class Network {
 
         this.services = services;
     }
-
     /**
      * This constructor creates a new random Network using the given parameters
      * @param numSensors Number of sensors composing the network

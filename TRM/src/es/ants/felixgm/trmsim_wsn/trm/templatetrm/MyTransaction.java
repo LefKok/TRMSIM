@@ -39,87 +39,56 @@
  * along with this program (lgpl.txt).  If not, see <http://www.gnu.org/licenses/>
  */
 
-package es.ants.felixgm.trmsim_wsn.satisfaction;
+package es.ants.felixgm.trmsim_wsn.trm.templatetrm;
+
+import es.ants.felixgm.trmsim_wsn.satisfaction.*;
 
 /**
  * <p>
- * This class models the representation of the satisfaction of a client with a
- * received service, through an interval of real numbers
+ * This class models a transaction between two sensors and the corresponding
+ * satisfaction of the client who received the service
  * </p>
  * 
  * @author <a href="http://ants.dif.um.es/~felixgm/en"
  *         target="_blank">F&eacute;lix G&oacute;mez M&aacute;rmol</a>, <a
  *         href="http://webs.um.es/gregorio" target="_blank">Gregorio
- *         Mart&iacute;nez P&eacute;rez</a>
- * @version 0.4
+ *         Mart&iacute;nez P&eacute;rez</a> and Antonio Bern&aacute;rdez
+ * @version 0.3
  * @since 0.2
  */
-public class SatisfactionInterval implements Satisfaction {
-	/** Lower bound of the interval */
-	private double min;
-	/** Upper bound of the interval */
-	private double max;
-	/** Actual satisfaction value */
-	private double value;
+public class MyTransaction {
+	/** The service provider */
+	/** Outcome with the satisfaction of the client with the received service */
+	private MyOutcome outcome;
+
+	protected final double severity;
+	protected double fading;
+	protected String id=null;
 
 	/**
-	 * Class SatisfactionInterval constructor
+	 * Class Transaction constructor
 	 * 
-	 * @param min
-	 *            Lower bound of the interval
-	 * @param max
-	 *            Upper bound of the interval
-	 * @param value
-	 *            Actual satisfaction value
+	 * @param outcome
+	 *            Outcome with the satisfaction of the client with the received
+	 *            service
 	 */
-	public SatisfactionInterval(double min, double max, double value) {
-		if (min > max)
-			min = max;
-		if ((min > value) || (max < value))
-			value = min;
-		this.min = min;
-		this.max = max;
-		this.value = value;
+	public MyTransaction(MyOutcome outcome) {
+		this.outcome = outcome;
+		fading = 1.0;
+		severity = Math.round(10 * (Math.random() * (0.7) + 0.3)) / 10.0;
 	}
-
+	public MyTransaction(MyOutcome outcome, double severity,String id) {
+		this.outcome = outcome;
+		fading = 1.0;
+		this.severity = severity;
+		this.id=id;
+	}
 	/**
-	 * Returns the actual satisfaction value
+	 * Returns the satisfaction of the client with the received service
 	 * 
-	 * @return The actual satisfaction value
+	 * @return The satisfaction of the client with the received service
 	 */
-	public double getSatisfactionValue() {
-		return value;
-	}
-
-	/**
-	 * This method returns the lower bound of the interval
-	 * 
-	 * @return The lower bound of the interval
-	 */
-	public double getMin() {
-		return min;
-	}
-
-	/**
-	 * This method returns the upper bound of the interval
-	 * 
-	 * @return The upper bound of the interval
-	 */
-	public double getMax() {
-		return max;
-	}
-
-	@Override
-	public boolean isSatisfied() {
-		return (value > ((max - Math.abs(min)) / 2));
-	}
-
-	@Override
-	public Satisfaction aggregate(Satisfaction satisfaction) {
-		return new SatisfactionInterval(Math.min(min,
-				((SatisfactionInterval) satisfaction).getMin()), Math.max(max,
-				((SatisfactionInterval) satisfaction).getMax()),
-				(value + ((SatisfactionInterval) satisfaction)
-						.getSatisfactionValue()) / 2.0);
+	public SatisfactionInterval getSatisfaction() {
+		return (SatisfactionInterval) outcome.get_satisfaction();
 	}
 }

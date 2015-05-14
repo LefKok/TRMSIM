@@ -100,8 +100,8 @@ public abstract class Outcome {
      * of outcomes
      */
     public static Outcome computeOutcomes(Collection<Outcome> outcomes) {
-        if ((outcomes == null) || (outcomes.size() == 0))
-            return null;
+        if ((outcomes == null) || (outcomes.size() == 0)){System.out.print("malakiaaaaaaaaaaa");
+            return null;}
 
         Object outcomesArray[] = outcomes.toArray();
         Outcome outcome = (Outcome)outcomesArray[0];

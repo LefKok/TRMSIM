@@ -101,7 +101,8 @@ public class BasicOutcome extends Outcome {
             if (aggregatedSatisfaction == null)
                 aggregatedSatisfaction = outcome.get_satisfaction();
             else
-                aggregatedSatisfaction = aggregatedSatisfaction.aggregate(outcome.get_satisfaction());
+				aggregatedSatisfaction = aggregatedSatisfaction
+						.aggregate(outcome.get_satisfaction());
 
             if (((BasicOutcome)outcome).get_avgPathLength() == 0.0)
                 numBenevolentPaths--;

@@ -37,158 +37,266 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program (lgpl.txt).  If not, see <http://www.gnu.org/licenses/>
-*/
+ */
 
 package es.ants.felixgm.trmsim_wsn.trm.templatetrm;
 
 import es.ants.felixgm.trmsim_wsn.network.Network;
 import es.ants.felixgm.trmsim_wsn.network.Sensor;
 import es.ants.felixgm.trmsim_wsn.network.Service;
+import es.ants.felixgm.trmsim_wsn.satisfaction.SatisfactionInterval;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.PriorityQueue;
 import java.util.Set;
 
 /**
- * <p>This class models a network composed by sensors implementing TemplateTRM</p>
- * @author <a href="http://ants.dif.um.es/~felixgm/en" target="_blank">F&eacute;lix G&oacute;mez M&aacute;rmol</a>, <a href="http://webs.um.es/gregorio" target="_blank">Gregorio Mart&iacute;nez P&eacute;rez</a>
+ * <p>
+ * This class models a network composed by sensors implementing TemplateTRM
+ * </p>
+ * 
+ * @author <a href="http://ants.dif.um.es/~felixgm/en"
+ *         target="_blank">F&eacute;lix G&oacute;mez M&aacute;rmol</a>, <a
+ *         href="http://webs.um.es/gregorio" target="_blank">Gregorio
+ *         Mart&iacute;nez P&eacute;rez</a>
  * @version 0.3
  * @since 0.3
  */
 public class TemplateTRM_Network extends Network {
+
+	protected HashMap<String, Application_struct> Service_VEs; //
+
+	/**
+	 * This constructor creates a new random TemplateTRM Network using the given
+	 * parameters
+	 * 
+	 * @param numSensors
+	 *            Network number sensors
+	 * @param probClients
+	 *            The network will have a number of clients depending of this
+	 *            parameter.
+	 * @param rangeFactor
+	 *            Range Factor.
+	 * @param probServices
+	 *            Probability of servers offers services and clients requesting
+	 *            services.
+	 * @param probGoodness
+	 *            Probability of servers being good.
+	 * @param services
+	 *            Services that servers offers to clients.
+	 */
+	public TemplateTRM_Network(int numSensors, double probClients,
+			double rangeFactor, Collection<Double> probServices,
+			Collection<Double> probGoodness, Collection<Service> services) {
+		super(null, null, null);
+		Service_VEs = new HashMap<String, Application_struct>();
+		clients = new ArrayList<Sensor>();
+		servers = new ArrayList<Sensor>();
+		sensors = new ArrayList<Sensor>();
+		this.services = new ArrayList<Service>();// ola ta services tou
+													// systhmatos
+		/*
+		 * services.add(new Service("vehicle")); probServices.add(0.7);
+		 * probGoodness.add(0.7);
+		 */
+		for (Service service : services)
+			Service_VEs.put(service.id,
+					new Application_struct(service.id,
+							Math.random() * 0.5 + 0.5)); // create Platforms log
+															// file
+
+		Sensor.resetId();
+		Sensor.setMaxDistance(maxDistance);
+
+		for (int i = 0; i < numSensors; i++) {
+			if (Math.random() <= probClients) { // client intialize
+				TemplateTRM_Sensor client = newSensor();
+				clients.add(client);
+				sensors.add(client);
+				Iterator<Double> itProbServices = probServices.iterator();
+				for (Service service : services)
+					// add requested services
+					if (Math.random() <= itProbServices.next().doubleValue()) {
+						client.addNewService(service.id);
+					}
+
+			} else { // server intialize
+				TemplateTRM_Sensor server = newSensor();
+				clients.add(server);
+				servers.add(server);
+				sensors.add(server);
+
+				Iterator<Double> itProbServices1 = probServices.iterator();
+				Iterator<Double> itProbServices2 = probServices.iterator();
+				Iterator<Double> itProbGoodness = probGoodness.iterator();
+
+				for (Service service : services)
+					// add requested services
+					if (Math.random() <= itProbServices1.next().doubleValue()) {
+						server.addNewService(service.id);
+					}
+
+				for (Service service : services){
+					// add provided services
+					if (Math.random() <= itProbServices2.next().doubleValue()) {
+						Service_VEs.get(service.id).followee_put(server,0.0); // network
+																			// has
+																			// every
+																			// sensor
+																			// classfied
+																			// by
+																			// provided
+																			// service
+						if (Math.random() <= itProbGoodness.next()
+								.doubleValue()){// check quality of service
+							//server.addService(service, 1.0); // neutral*/
+						
+						 /* if(Math.random() <= 0.5 ) server.addService(service,
+						  Math.round((10*(Math.random()*(0.25)+0.7)))/10.0);
+						  //neutral 
+						  else*/ server.addService(service, 1.0);
+							  //server.addService(service,Math.round((10*(Math.random()*(0.15)+0.85)))/10.0);
+								  
+						  ///vendor
+						 
+						}else{
+							// server.addService(service,
+							 //Math.round((10*(Math.random()*(0.0))))/10.0);
+							 //malicious*/
+							server.addService(service, 0.0); // neutral
+							server.malicious=true;
+						}
+						if (!this.services.contains(service))
+							this.services.add(service);
+					}
+			}}
+		}
+
+		if (clients.size() == 0) {
+			TemplateTRM_Sensor client = newSensor();
+			clients.add(client);
+			sensors.add(client);
+			Iterator<Double> itProbServices = probServices.iterator();
+			for (Service service : services)
+				// add requested services
+				//if (Math.random() <= itProbServices.next().doubleValue()) {
+				if (service.equals("My service")){
+					client.addNewService(service.id);
+				}
+		}
+
+		// We are going to add some friends to the sensors one for each service
+		// it requests
+		for (Sensor client : clients) {
+			TemplateTRM_Sensor myclient = (TemplateTRM_Sensor) client;
+			Set<String> ServiceSet = myclient.getRequestedServices();
+			for (String service : ServiceSet) {
+				if (service.equals("My service")){
+				// System.out.println(Service_VEs.get(service.id)+service.toString());
+						//myclient.addfollowee(Service_VEs.get(service).get_random_entry(), service,1.0);
+					//	myclient.addfollowee(Service_VEs.get(service).get_random_entry(), service,1.0);
+						myclient.addfollowee(Service_VEs.get(service).get_random_entry(), service,0.9);}
+
+
+				
+			}
+		}
+
+	}
+
+	/**
+	 * This method loads a network from a XML file and creates the specific
+	 * corresponding TemplateTRM Network
+	 * 
+	 * @param xmlFilePath
+	 *            Path of the XML to load the network from
+	 * @throws java.lang.Exception
+	 *             If the XML file given does not have the appropriate
+	 *             structure, or if a sensor links to an undefined sensor, or if
+	 *             a sensor links to itself
+	 */
+	public TemplateTRM_Network(String xmlFilePath) throws Exception {
+		super(xmlFilePath);
+		reset();
+	}
+
+	@Override
+	public TemplateTRM_Sensor newSensor() {
+		return new TemplateTRM_Sensor(this);
+	}
+
+	@Override
+	public Sensor newSensor(int id, double x, double y) {
+		return new TemplateTRM_Sensor(id, x, y,this);
+	}
+
+	public synchronized void report(Application_struct reportedService, Double value , Boolean collusion) {
+		Application_struct myStruct = Service_VEs.get(reportedService.service.id);
+		ArrayList<String> keysAsArray = new ArrayList<String>(
+				reportedService.followees.keySet());
+		for (String id : keysAsArray) {
+			Followee_struct global = myStruct.followees.get(id);
+			Followee_struct local = reportedService.followees.get(id);
+			if (collusion && (value >=0)){
+
+				if ( value <=0.5){
+
+					
+					
+						//System.out.println("I am bad = "+value);
+						//System.out.println("he is good = "+(1-local.calculate_Trust()));
+						myStruct.addNewShare(id, new MyOutcome(new SatisfactionInterval(0.0, 0.9,1-local.calculate_Trust())));
+						//}
+				//	else 	myStruct.addNewShare(id, new MyOutcome(new SatisfactionInterval(0.0, 1.0,1.0)));
+						
+					}else 	myStruct.addNewShare(id, new MyOutcome(new SatisfactionInterval(0.0, 0.9,local.calculate_Trust())));
+				}else if (value>=0) 	myStruct.addNewShare(id, new MyOutcome(new SatisfactionInterval(0.0, 0.9,local.calculate_Trust())));
+			global.fade();
+		}
+		
+	}
+
+	/*public synchronized TemplateTRM_Sensor get_recommendation(String s) {
+		Application_struct myStruct = Service_VEs.get(s);
+		String f = myStruct.rank_friends2().id;
+		if (myStruct.followees.get(f)!=null)
+		return myStruct.followees.get(f).Sensor;
+		else
+			return null;
+	}*/
 	
+	public synchronized TemplateTRM_Sensor get_recommendation(String s) {
+	Application_struct myStruct = Service_VEs.get(s);
+	PriorityQueue<ComparableFriend>  MyQueue = new PriorityQueue<ComparableFriend>();
+	MyQueue = myStruct.rank_friends("trust");
+	double propability = Math.random();//0.25 o prwtos 0.25 o deyteros 0.25 o tritos 0.25 random me miden trust
+		if (propability<0.4 && !MyQueue.isEmpty())
+		{
+			String f = MyQueue.poll().id;
+			if (myStruct.followees.get(f)!=null)
+			return myStruct.followees.get(f).Sensor;
+		}
+		MyQueue.poll();
+		if (propability<0.8 && !MyQueue.isEmpty())
+		{
+			String f = MyQueue.poll().id;
+			if (myStruct.followees.get(f)!=null)
+			return myStruct.followees.get(f).Sensor;
+		}
+		if(!MyQueue.isEmpty()){
+		ComparableFriend f1 = MyQueue.poll();
+			while (!MyQueue.isEmpty() & f1.value>0.0)
+				MyQueue.poll();
+			if(!MyQueue.isEmpty()){
+				String f = MyQueue.poll().id;
+				if (myStruct.followees.get(f)!=null)
+				return myStruct.followees.get(f).Sensor;
+			}
+		}return null;
+}
 	
-    protected HashMap<String,Application_struct> Service_VEs; //
 
-	
-	
-    /**
-     * This constructor creates a new random TemplateTRM Network using the given parameters
-     * @param numSensors Network number sensors
-     * @param probClients The network will have a number of clients depending of this parameter.
-     * @param rangeFactor Range Factor.
-     * @param probServices Probability of servers offers services and clients requesting services.
-     * @param probGoodness Probability of servers being good.
-     * @param services Services that servers offers to clients.
-     */
-    public TemplateTRM_Network(
-            int numSensors,
-            double probClients,
-            double rangeFactor,
-            Collection<Double> probServices,
-            Collection<Double> probGoodness,
-            Collection<Service> services) {
-    	super(null,null,null);
-    	Service_VEs=new HashMap<String,Application_struct>();
-    	clients = new ArrayList<Sensor>();
-        servers = new ArrayList<Sensor>();
-        sensors = new ArrayList<Sensor>();
-        this.services = new ArrayList<Service>();//ola ta services tou systhmatos
-       /* services.add(new Service("vehicle"));
-        probServices.add(0.7);
-        probGoodness.add(0.7);*/
-        for (Service service : services)					
-        	Service_VEs.put(service.id,new Application_struct(service.id)); //create Platforms log file
-
-
-
-
-        Sensor.resetId();
-        Sensor.setMaxDistance(maxDistance);
-
-        for (int i = 0; i < numSensors; i++) {
-            if (Math.random() <= probClients) { //client intialize
-                TemplateTRM_Sensor client = newSensor();
-                clients.add(client);
-                sensors.add(client);
-                Iterator<Double> itProbServices = probServices.iterator(); 
-                for (Service service : services)					//add requested services
-                    if (Math.random() <= itProbServices.next().doubleValue()) {
-                    	client.addNewService(service.id);
-                    }
-                	
-            } else { 							//server intialize
-            	TemplateTRM_Sensor server = newSensor();
-                clients.add(server);
-                servers.add(server);
-                sensors.add(server);
-
-                Iterator<Double> itProbServices1 = probServices.iterator();
-                Iterator<Double> itProbServices2 = probServices.iterator(); 
-                Iterator<Double> itProbGoodness = probGoodness.iterator();
-                
-                for (Service service : services) //add requested services
-                    if (Math.random() <= itProbServices1.next().doubleValue()) {
-                    	server.addNewService(service.id);
-                    }
-                
-                for (Service service : services) //add provided services
-                    if (Math.random() <= itProbServices2.next().doubleValue()) { 
-                    	Service_VEs.get(service.id).followee_put(server); //network has every sensor classfied by provided service
-                    	if (Math.random() <= itProbGoodness.next().doubleValue())//check quality of service
-                            if(Math.random() <= 0.5 )
-                            	server.addService(service, Math.random()*(0.25)+0.5);  //neutral
-                            else server.addService(service, Math.random()*(0.25)+0.75); ///vendor
-                        else
-                            server.addService(service, Math.random()*0.5); //malicious
-
-                        if (!this.services.contains(service))
-                            this.services.add(service);
-                    }
-            }
-        }
-        
-        if (clients.size() == 0) {
-        	TemplateTRM_Sensor client = newSensor();
-            clients.add(client);
-            sensors.add(client);
-            Iterator<Double> itProbServices = probServices.iterator(); 
-            for (Service service : services)					//add requested services
-                if (Math.random() <= itProbServices.next().doubleValue()) {
-                	client.addNewService(service.id);
-                }
-        }
-
-        // We are going to add some friends to the sensors one for each service it requests
-        for (Sensor client : clients){
-        	TemplateTRM_Sensor myclient = (TemplateTRM_Sensor) client;
-        	Set<String> ServiceSet = myclient.getRequestedServices();
-        	for (String service : ServiceSet){
-        	//	System.out.println(Service_VEs.get(service.id)+service.toString());
-        		TemplateTRM_Sensor followee = Service_VEs.get(service).get_random_entry();
-        		client.addLink(followee);
-        		myclient.addfollowee(followee,service);      		
-        	}      	
-        }
-    	
-    	
-        reset();
-        
-        
-        
-    }
-
-    /**
-     * This method loads a network from a XML file and creates the specific
-     * corresponding TemplateTRM Network
-     * @param xmlFilePath Path of the XML to load the network from
-     * @throws java.lang.Exception If the XML file given does not have the appropriate structure, or if
-     * a sensor links to an undefined sensor, or if a sensor links to itself
-     */
-    public TemplateTRM_Network(String xmlFilePath) throws Exception {
-        super(xmlFilePath);
-        reset();
-    }
-
-    @Override
-    public TemplateTRM_Sensor newSensor(){
-        return new TemplateTRM_Sensor();
-    }
-
-    @Override
-    public Sensor newSensor(int id, double x, double y) {
-        return new TemplateTRM_Sensor(id,x,y);
-    }
 }

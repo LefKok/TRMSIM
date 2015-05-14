@@ -98,7 +98,7 @@ public abstract class Sensor implements Runnable {
     /** Number of service requests provided by this sensor after which it goes to sleep */
     public static final int numRequestsThreshold = 20;
     /** Used to determine the amount of time (in ms) a sensor stays asleep */
-    private static final long sleepingTimeoutMilis = 1000;
+    public static final long sleepingTimeoutMilis = 1000;
     /** Current Trust and Reputation model used by every Sensor */
     public static TRModel_WSN trmmodelWSN;
     /** Last outcome of a performed transaction */
@@ -385,7 +385,7 @@ public abstract class Sensor implements Runnable {
      * this one, one step forward
      * @return Neighbor sensors of this sensor
      */
-    public Collection<Sensor> getNeighbors() {
+    public synchronized Collection<Sensor> getNeighbors() {
         Collection<Sensor> neighbors = new ArrayList<Sensor>();
 
         for (Link link : links) { // We add the destination of all the links

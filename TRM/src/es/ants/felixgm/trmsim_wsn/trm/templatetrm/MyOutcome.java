@@ -3,33 +3,28 @@
  */
 package es.ants.felixgm.trmsim_wsn.trm.templatetrm;
 
-import java.util.Collection;
 
-import es.ants.felixgm.trmsim_wsn.outcomes.Outcome;
-import es.ants.felixgm.trmsim_wsn.satisfaction.Satisfaction;
+import es.ants.felixgm.trmsim_wsn.outcomes.BasicOutcome;
+import es.ants.felixgm.trmsim_wsn.satisfaction.*;
+
 
 /**
  * @author Lefteris
  *
  */
-public class MyOutcome extends Outcome {
+public class MyOutcome extends BasicOutcome {
 
-	
+    protected SatisfactionDiscreteScale satisfaction;
+
 
 	/**
 	 * @param satisfaction
 	 */
-	public MyOutcome(Satisfaction satisfaction,double severity) {
-		super(satisfaction);
+	public MyOutcome(SatisfactionInterval satisfaction) {
+		super(satisfaction,satisfaction.getSatisfactionValue(),1);
 
-		// TODO Auto-generated constructor stub
 	}
 
 
-	@Override
-	public Outcome aggregate(Collection<Outcome> outcomes) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 }

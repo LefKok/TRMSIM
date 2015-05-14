@@ -166,7 +166,7 @@ public class NetworkPanel extends javax.swing.JPanel {
                     int x1 = (int)(width*axesMargin+(neighbor.getX()/Network.get_maxDistance())*width*(1.0-2*axesMargin));
                     int y1 = (int)(height*(1-axesMargin)-(neighbor.getY()/Network.get_maxDistance())*height*(1.0-2*axesMargin));
                     graphics.drawLine(x, y, x1, y1);
-                    drawArrow(this.getGraphics(),x, y, x1, y1); //Lefteris
+                   drawArrow(this.getGraphics(),x, y, x1, y1); //Lefteris
                 }
         }
         if (showIds) {
